@@ -61,3 +61,36 @@ async def send_product_by_filter(call:CallbackQuery,state:FSMContext):
 
         await call.message.edit_reply_markup(reply_markup=None)
         await call.message.answer(f"Siz gender")
+
+@user_router.callback_query(F.data.startswith("season_"))
+async def send_product_by_filter(call: CallbackQuery, state: FSMContext):
+    season = call.data.split("_")[-1]
+
+    if season == "back":
+        await call.message.edit_caption(caption=CATEGORY_TEXT)
+        await call.message.edit_reply_markup(reply_markup=CATEGORY_BUTTONS)
+    else:
+        await state.update_data(season=season)
+        data = await state.get_data()
+
+        gender = data.get("gender", "unknown")
+        category = data.get("category", "unknown")
+
+        
+        await call.message.edit_reply_markup(reply_markup=None)
+
+        
+        await call.message.answer(
+            f"🧾 Siz tanladingiz:\n"
+            f"👕 Kategoriya: <b>{category}</b>\n"
+            f"🚻 Gender: <b>{gender}</b>\n"
+            f"🍂 Mavsum: <b>{season}</b>\n\n"
+            f"Endi buyurtma miqdorini tanlang 👇",
+            parse_mode="HTML"
+        )
+
+        
+        from buttons import order_quantity_button
+
+    
+        await call.message.answer("Nechta buyurtma qilmoqchisiz?", reply_markup=order_quantity_button(1))
